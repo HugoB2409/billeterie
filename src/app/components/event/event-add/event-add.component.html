@@ -1,0 +1,93 @@
+<div *ngIf="eventForm">
+  <form [formGroup]="eventForm" (ngSubmit)="saveEvent()">
+    <div class="flex">
+      <h1 class="grow">Nouveau spectacle</h1>
+      <button
+        mat-raised-button
+        color="primary"
+        [disabled]="!eventForm.valid"
+        type="submit"
+      >
+        Enregistrer
+      </button>
+    </div>
+
+    <mat-divider class="bottom-margin"></mat-divider>
+
+    <mat-form-field class="full-width">
+      <mat-label>Titre</mat-label>
+      <input matInput type="text" formControlName="title" />
+      <mat-error
+        *ngIf="
+          eventForm.get('title')?.invalid &&
+          (eventForm.get('title')?.dirty || eventForm.get('title')?.touched)
+        "
+        >Champ Titre invalide</mat-error
+      >
+    </mat-form-field>
+
+    <mat-form-field class="full-width">
+      <mat-label>Date</mat-label>
+      <mtx-datetimepicker #datetimePicker type="datetime"></mtx-datetimepicker>
+      <input
+        matInput
+        formControlName="date"
+        [mtxDatetimepicker]="datetimePicker"
+        required
+      />
+      <mtx-datetimepicker-toggle
+        [for]="datetimePicker"
+        matSuffix
+      ></mtx-datetimepicker-toggle>
+      <mat-error
+        *ngIf="
+          eventForm.get('date')?.invalid &&
+          (eventForm.get('date')?.dirty || eventForm.get('date')?.touched)
+        "
+        >Champ Date invalide</mat-error
+      >
+    </mat-form-field>
+
+    <mat-divider></mat-divider>
+
+    <div formArrayName="options">
+      <div class="flex">
+        <h2 class="grow">Options de sièges</h2>
+        <button
+          mat-stroked-button
+          color="primary"
+          type="button"
+          (click)="addOption()"
+        >
+          Ajouter une option
+        </button>
+      </div>
+      <div
+        [formGroupName]="i"
+        *ngFor="let option of options.controls; let i = index"
+      >
+        <h3>Options #{{ i + 1 }}</h3>
+        <div class="flex">
+          <mat-form-field class="right-margin">
+            <mat-label>Nom de l'option</mat-label>
+            <input matInput type="text" formControlName="name" />
+          </mat-form-field>
+
+          <mat-form-field class="right-margin">
+            <mat-label>Prix de l'option ($)</mat-label>
+            <input matInput type="number" formControlName="price" />
+          </mat-form-field>
+
+          <button
+            mat-icon-button
+            color="warn"
+            class="delete-icon"
+            (click)="removeOption(i)"
+          >
+            <mat-icon>delete</mat-icon>
+          </button>
+        </div>
+      </div>
+    </div>
+  </form>
+</div>

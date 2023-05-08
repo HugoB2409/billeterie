@@ -1,0 +1,46 @@
+<h1 mat-dialog-title>Résumer de la réservation</h1>
+<div mat-dialog-content>
+  <h3>Client</h3>
+  <div *ngIf="client">
+    <span>{{ client.firstname }} {{ client.lastname }}</span>
+    <br />
+    <span>{{ client.address }}</span>
+    <br />
+    <span>{{ client.phoneNumber }}</span>
+    <br />
+  </div>
+  <mat-divider></mat-divider>
+  <h3>Spectacle</h3>
+  <div *ngIf="event">
+    <span>{{ event.title }} - {{ event.date }}</span>
+    <br />
+  </div>
+  <mat-divider></mat-divider>
+  <h3>Sièges</h3>
+  <div *ngIf="seats">
+    <div *ngFor="let seat of seats">
+      <span>{{ seat.name }} - {{ seat.price }} $</span>
+      <br />
+      <span class="left-margin">Quantité: {{ seat.quantity }}</span>
+      <br />
+    </div>
+  </div>
+  <mat-divider></mat-divider>
+  <h3>Prix total</h3>
+  <div *ngIf="total">
+    <span>{{ total }} $</span>
+    <br />
+  </div>
+</div>
+<div mat-dialog-actions>
+  <button mat-button mat-dialog-close>Annuler</button>
+  <button
+    mat-button
+    mat-dialog-close
+    cdkFocusInitial
+    color="primary"
+    (click)="confirm()"
+  >
+    Réserver
+  </button>
+</div>

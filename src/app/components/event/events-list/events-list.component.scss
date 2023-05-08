@@ -1,0 +1,17 @@
+.flex {
+  display: flex;
+  align-items: center;
+}
+
+.grow {
+  flex-grow: 1;
+}
+
+.top-margin {
+  margin-top: 20px;
+}
+
+tr.mat-mdc-row:hover:hover {
+  background-color: rgb(0, 0, 0, 0.1);
+  cursor: pointer;
+}

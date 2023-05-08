@@ -1,0 +1,41 @@
+form {
+  margin-top: 20px;
+}
+
+.flex {
+  display: flex;
+  align-items: baseline;
+}
+
+.grow {
+  flex-grow: 1;
+}
+
+.bottom-margin {
+  margin-bottom: 20px;
+}
+
+.right-margin {
+  margin-right: 20px;
+}
+
+.top-margin {
+  margin-top: 20px;
+}
+
+.delete-icon {
+  margin-top: 15px;
+}
+
+.full-width {
+  width: 100%;
+}
+
+.quantity-input {
+  width: 70px;
+}
+
+.mat-column-quantity {
+  text-align: right;
+  justify-content: flex-end;
+}

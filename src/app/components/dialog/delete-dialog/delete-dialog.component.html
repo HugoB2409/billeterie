@@ -1,0 +1,14 @@
+<h1 mat-dialog-title>Confirmer</h1>
+<div mat-dialog-content>Êtes-vous sûr de vouloir supprimer cette élément ?</div>
+<div mat-dialog-actions>
+  <button mat-button mat-dialog-close>Annuler</button>
+  <button
+    mat-button
+    mat-dialog-close
+    cdkFocusInitial
+    color="warn"
+    (click)="confirm()"
+  >
+    Supprimer
+  </button>
+</div>

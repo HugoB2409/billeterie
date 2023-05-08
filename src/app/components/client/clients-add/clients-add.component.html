@@ -1,0 +1,69 @@
+<div *ngIf="clientForm">
+  <form [formGroup]="clientForm" (ngSubmit)="saveClient()">
+    <div class="flex">
+      <h1 class="grow">Nouveau client</h1>
+      <button
+        mat-raised-button
+        color="primary"
+        [disabled]="!clientForm.valid"
+        type="submit"
+      >
+        Enregistrer
+      </button>
+    </div>
+
+    <mat-divider class="bottom-margin"></mat-divider>
+
+    <mat-form-field class="full-width">
+      <mat-label>Prénom</mat-label>
+      <input matInput type="text" formControlName="firstname" />
+      <mat-error
+        *ngIf="
+          clientForm.get('firstname')?.invalid &&
+          (clientForm.get('firstname')?.dirty ||
+            clientForm.get('firstname')?.touched)
+        "
+        >Champ Prénom invalide</mat-error
+      >
+    </mat-form-field>
+
+    <mat-form-field class="full-width">
+      <mat-label>Nom</mat-label>
+      <input matInput type="text" formControlName="lastname" />
+      <mat-error
+        *ngIf="
+          clientForm.get('lastname')?.invalid &&
+          (clientForm.get('lastname')?.dirty ||
+            clientForm.get('lastname')?.touched)
+        "
+        >Champ Nom invalide</mat-error
+      >
+    </mat-form-field>
+
+    <mat-form-field class="full-width">
+      <mat-label>Addresse</mat-label>
+      <input matInput type="text" formControlName="address" />
+      <mat-error
+        *ngIf="
+          clientForm.get('address')?.invalid &&
+          (clientForm.get('address')?.dirty ||
+            clientForm.get('address')?.touched)
+        "
+        >Champ Addresse invalide</mat-error
+      >
+    </mat-form-field>
+
+    <mat-form-field class="full-width">
+      <mat-label>Numéro de téléphonne</mat-label>
+      <input matInput type="text" formControlName="phoneNumber" />
+      <mat-error
+        *ngIf="
+          clientForm.get('phoneNumber')?.invalid &&
+          (clientForm.get('phoneNumber')?.dirty ||
+            clientForm.get('phoneNumber')?.touched)
+        "
+        >Champ Numéro de téléphonne invalide</mat-error
+      >
+    </mat-form-field>
+  </form>
+</div>
