@@ -1,13 +1,22 @@
 import { Component, OnInit } from '@angular/core';
 import { Client } from 'src/app/models/client.model';
 import { Event } from 'src/app/models/event.model';
-import { Reservation, Seat } from 'src/app/models/reservation.model';
+import { Reservation } from 'src/app/models/reservation.model';
 import { ClientService } from 'src/app/services/client.service';
 import { EventService } from 'src/app/services/event.service';
 import { ReservationService } from 'src/app/services/reservation.service';
 import { uniq } from 'lodash';
 import { switchMap, map } from 'rxjs/operators';
 import { combineLatest, forkJoin, of } from 'rxjs';
+import { Seat } from 'src/app/models/seat.model';
+
+interface ReservationSummary {
+  client: Client | undefined;
+  event: Event | undefined;
+  key?: string | null | undefined;
+  seats?: Seat[] | undefined;
+  total?: number | undefined;
+}
 
 @Component({
   selector: 'app-reservations-list',
@@ -15,26 +24,19 @@ import { combineLatest, forkJoin, of } from 'rxjs';
   styleUrls: ['./reservations-list.component.scss'],
 })
 export class ReservationsListComponent implements OnInit {
-  reservations?: {
-    client: Client | undefined;
-    event: Event | undefined;
-    key?: string | null | undefined;
-    seats?: Seat[] | undefined;
-    total?: number | undefined;
-  }[];
-  columnsToDisplay = ['spectacle', 'client', 'total'];
+  private _reservations?: ReservationSummary[] = undefined;
+  private _columnsToDisplay: string[] = ['spectacle', 'client', 'total'];
 
   constructor(
     private reservationService: ReservationService,
     private clientService: ClientService,
-    private eventService: EventService
-  ) {}
+    private eventService: EventService) { }
 
-  ngOnInit(): void {
+  public ngOnInit(): void {
     this.getReservations();
   }
 
-  getReservations(): void {
+  private getReservations(): void {
     this.reservationService
       .getAll()
       .pipe(
@@ -67,14 +69,22 @@ export class ReservationsListComponent implements OnInit {
           }));
         })
       )
-      .subscribe((data) => (this.reservations = data));
+      .subscribe((data) => (this._reservations = data));
   }
 
-  getClients(clientIds: (string | undefined)[]) {
+  private getClients(clientIds: (string | undefined)[]) {
     return clientIds.map((clientId) => this.clientService.get(clientId ?? ''));
   }
 
-  getEvents(eventIds: (string | undefined)[]) {
+  private getEvents(eventIds: (string | undefined)[]) {
     return eventIds.map((eventId) => this.eventService.get(eventId ?? ''));
+  }
+
+  public get reservations(): ReservationSummary[] | undefined {
+    return this._reservations;
+  }
+
+  public get columnsToDisplay(): string[] {
+    return this._columnsToDisplay;
   }
 }

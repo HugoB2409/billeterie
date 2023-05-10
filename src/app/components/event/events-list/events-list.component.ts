@@ -8,14 +8,22 @@ import { EventService } from 'src/app/services/event.service';
   styleUrls: ['./events-list.component.scss'],
 })
 export class EventsListComponent implements OnInit {
-  events?: Event[];
-  columnsToDisplay = ['title', 'date'];
+  private _events?: Event[] = undefined;
+  private _columnsToDisplay: string[] = ['title', 'date'];
 
-  constructor(private eventService: EventService) {}
+  constructor(private eventService: EventService) { }
 
-  ngOnInit(): void {
+  public ngOnInit(): void {
     this.eventService.getAll().subscribe((data) => {
-      this.events = data;
+      this._events = data;
     });
+  }
+
+  public get events(): Event[] | undefined {
+    return this._events;
+  }
+
+  public get columnsToDisplay(): string[] {
+    return this._columnsToDisplay;
   }
 }

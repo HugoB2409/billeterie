@@ -12,52 +12,49 @@ import { DeleteDialogComponent } from '../../dialog/delete-dialog/delete-dialog.
   styleUrls: ['./clients-details.component.scss'],
 })
 export class ClientsDetailsComponent {
-  client?: Client | null;
-  key?: string | null;
-  clientForm?: FormGroup;
+  private _clientForm?: FormGroup = undefined;
+  private _client?: Client = undefined;
+  private _key: string | null = null;
 
   constructor(
     private router: Router,
     private formBuilder: FormBuilder,
     private activatedRoute: ActivatedRoute,
     private clientService: ClientService,
-    public dialog: MatDialog
-  ) {}
+    private dialog: MatDialog) { }
 
-  ngOnInit() {
+  public ngOnInit() {
     this.activatedRoute.paramMap.subscribe((paramMap) => {
-      this.key = paramMap.get('key');
-      if (this.key) {
-        this.clientService.get(this.key).subscribe((data) => {
-          this.client = data;
-
-          this.clientForm = this.formBuilder.group({
-            firstname: [this.client?.firstname, [Validators.required]],
-            lastname: [this.client?.lastname, [Validators.required]],
-            address: [this.client?.address, [Validators.required]],
-            phoneNumber: [this.client?.phoneNumber, [Validators.required]],
-          });
+      this._key = paramMap.get('key');
+      if (!this._key) return;
+      this.clientService.get(this._key).subscribe((data) => {
+        this._client = data;
+        this._clientForm = this.formBuilder.group({
+          firstname: [this._client?.firstname, [Validators.required]],
+          lastname: [this._client?.lastname, [Validators.required]],
+          address: [this._client?.address, [Validators.required]],
+          phoneNumber: [this._client?.phoneNumber, [Validators.required]],
         });
-      }
-    });
-  }
-
-  modifyClient(): void {
-    if (this.key && this.clientForm) {
-      this.clientService.update(this.key, this.clientForm?.value).then(() => {
-        this.router.navigate(['/clients']);
       });
-    }
+    });
   }
 
-  delete() {
-    const dialogRef = this.dialog.open(DeleteDialogComponent);
+  public async modifyClient(): Promise<void> {
+    if (!this._key || !this._clientForm) return;
+    await this.clientService.update(this._key, this._clientForm?.value);
+    this.router.navigate(['/clients']);
+  }
 
-    dialogRef.afterClosed().subscribe((result) => {
-      if (result && this.key) {
-        this.clientService.delete(this.key);
-        this.router.navigate(['/clients']);
-      }
+  public async deleteClient(): Promise<void> {
+    const dialogRef = this.dialog.open(DeleteDialogComponent);
+    dialogRef.afterClosed().subscribe(async (result: boolean) => {
+      if (!result || !this._key) return;
+      await this.clientService.delete(this._key);
+      this.router.navigate(['/clients']);
     });
+  }
+
+  public get clientForm(): FormGroup | undefined {
+    return this._clientForm;
   }
 }

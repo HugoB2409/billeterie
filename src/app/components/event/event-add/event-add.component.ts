@@ -1,7 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { Event } from 'src/app/models/event.model';
 import { EventService } from 'src/app/services/event.service';
 
 @Component({
@@ -10,24 +9,22 @@ import { EventService } from 'src/app/services/event.service';
   styleUrls: ['./event-add.component.scss'],
 })
 export class EventAddComponent implements OnInit {
-  event: Event = new Event();
-  eventForm?: FormGroup;
+  private _eventForm?: FormGroup = undefined;
 
   constructor(
     private router: Router,
     private formBuilder: FormBuilder,
-    private eventService: EventService
-  ) {}
+    private eventService: EventService) { }
 
-  ngOnInit(): void {
-    this.eventForm = this.formBuilder.group({
+  public ngOnInit(): void {
+    this._eventForm = this.formBuilder.group({
       title: ['', [Validators.required]],
       date: ['', [Validators.required]],
       options: this.formBuilder.array([]),
     });
   }
 
-  addOption() {
+  public addOption(): void {
     const option = this.formBuilder.group({
       name: ['', [Validators.required]],
       price: ['', [Validators.required]],
@@ -35,20 +32,22 @@ export class EventAddComponent implements OnInit {
     this.options.push(option);
   }
 
-  removeOption(i: number) {
+  public removeOption(i: number): void {
     this.options.removeAt(i);
   }
 
-  get options() {
-    return this.eventForm?.get('options') as FormArray;
+  public async saveEvent(): Promise<void> {
+    if (!this._eventForm) return;
+    this._eventForm.value.date = this._eventForm?.value.date.toString();
+    await this.eventService.create(this._eventForm?.value);
+    this.router.navigate(['/']);
   }
 
-  saveEvent(): void {
-    if (this.eventForm) {
-      this.eventForm.value.date = this.eventForm?.value.date.toString();
-      this.eventService.create(this.eventForm?.value).then(() => {
-        this.router.navigate(['/']);
-      });
-    }
+  public get options(): FormArray {
+    return this._eventForm?.get('options') as FormArray;
+  }
+
+  public get eventForm(): FormGroup | undefined {
+    return this._eventForm;
   }
 }

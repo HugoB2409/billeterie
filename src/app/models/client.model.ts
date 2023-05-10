@@ -1,4 +1,4 @@
-export class Client {
+export interface Client {
   key?: string | null;
   firstname?: string;
   lastname?: string;

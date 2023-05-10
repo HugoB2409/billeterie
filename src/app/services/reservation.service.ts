@@ -2,7 +2,6 @@ import { Injectable } from '@angular/core';
 import {
   AngularFireDatabase,
   AngularFireList,
-  AngularFireObject,
 } from '@angular/fire/compat/database';
 import { Reservation } from '../models/reservation.model';
 import { IRealtimeDatabaseService } from './firebase.service';
@@ -12,19 +11,17 @@ import { Observable } from 'rxjs';
 @Injectable({
   providedIn: 'root',
 })
-export class ReservationService
-  implements IRealtimeDatabaseService<Reservation>
+export class ReservationService implements IRealtimeDatabaseService<Reservation>
 {
-  private dbPath = '/reservations';
-
-  reservationsRef: AngularFireList<Reservation>;
+  private _dbPath = '/reservations';
+  private _reservationsRef: AngularFireList<Reservation>;
 
   constructor(private db: AngularFireDatabase) {
-    this.reservationsRef = db.list(this.dbPath);
+    this._reservationsRef = db.list(this._dbPath);
   }
 
-  getAll(): Observable<Reservation[]> {
-    return this.reservationsRef
+  public getAll(): Observable<Reservation[]> {
+    return this._reservationsRef
       .snapshotChanges()
       .pipe(
         map((changes) =>
@@ -33,9 +30,9 @@ export class ReservationService
       );
   }
 
-  get(key: string): Observable<Reservation> {
+  public get(key: string): Observable<Reservation> {
     return this.db
-      .object(this.dbPath + '/' + key)
+      .object(this._dbPath + '/' + key)
       .snapshotChanges()
       .pipe(
         take(1),
@@ -47,19 +44,15 @@ export class ReservationService
       );
   }
 
-  create(reservation: Reservation): any {
-    return this.reservationsRef.push(reservation);
+  public create(reservation: Reservation): any {
+    return this._reservationsRef.push(reservation);
   }
 
-  update(key: string, value: any): Promise<void> {
-    return this.reservationsRef.update(key, value);
+  public update(key: string, value: any): Promise<void> {
+    return this._reservationsRef.update(key, value);
   }
 
-  delete(key: string): Promise<void> {
-    return this.reservationsRef.remove(key);
-  }
-
-  deleteAll(): Promise<void> {
-    return this.reservationsRef.remove();
+  public delete(key: string): Promise<void> {
+    return this._reservationsRef.remove(key);
   }
 }

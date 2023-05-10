@@ -1,7 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
-import { Client } from 'src/app/models/client.model';
 import { ClientService } from 'src/app/services/client.service';
 
 @Component({
@@ -10,17 +9,15 @@ import { ClientService } from 'src/app/services/client.service';
   styleUrls: ['./clients-add.component.scss'],
 })
 export class ClientsAddComponent implements OnInit {
-  client: Client = new Client();
-  clientForm?: FormGroup;
+  private _clientForm?: FormGroup = undefined;
 
   constructor(
     private router: Router,
     private formBuilder: FormBuilder,
-    private clientService: ClientService
-  ) {}
+    private clientService: ClientService) { }
 
-  ngOnInit(): void {
-    this.clientForm = this.formBuilder.group({
+  public ngOnInit(): void {
+    this._clientForm = this.formBuilder.group({
       firstname: ['', [Validators.required]],
       lastname: ['', [Validators.required]],
       address: ['', [Validators.required]],
@@ -28,11 +25,13 @@ export class ClientsAddComponent implements OnInit {
     });
   }
 
-  saveClient(): void {
-    if (this.clientForm) {
-      this.clientService.create(this.clientForm?.value).then(() => {
-        this.router.navigate(['/clients']);
-      });
-    }
+  public async saveClient(): Promise<void> {
+    if (!this._clientForm) return;
+    await this.clientService.create(this._clientForm?.value);
+    this.router.navigate(['/clients']);
+  }
+
+  public get clientForm(): FormGroup | undefined {
+    return this._clientForm;
   }
 }

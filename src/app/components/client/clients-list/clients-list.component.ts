@@ -9,23 +9,28 @@ import { CsvService } from 'src/app/services/csv.service';
   styleUrls: ['./clients-list.component.scss'],
 })
 export class ClientsListComponent implements OnInit {
-  clients?: Client[];
-  columnsToDisplay = ['firstname', 'lastname', 'address', 'phoneNumber'];
+  private _clients?: Client[] = undefined;
+  private _columnsToDisplay: string[] = ['firstname', 'lastname', 'address', 'phoneNumber'];
 
   constructor(
     private clientService: ClientService,
-    private csvService: CsvService
-  ) {}
+    private csvService: CsvService) { }
 
-  ngOnInit(): void {
-    this.clientService.getAll().subscribe((data) => {
-      this.clients = data;
+  public ngOnInit(): void {
+    this.clientService.getAll().subscribe((data: Client[]) => {
+      this._clients = data;
     });
   }
 
-  downloadCSV() {
-    if (this.clients) {
-      this.csvService.download(this.clients, 'clients.csv');
-    }
+  public downloadCSV(): void {
+    this.csvService.download(this._clients, 'clients.csv');
+  }
+
+  public get clients(): Client[] | undefined {
+    return this._clients;
+  }
+
+  public get columnsToDisplay(): string[] {
+    return this._columnsToDisplay;
   }
 }

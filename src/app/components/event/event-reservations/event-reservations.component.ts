@@ -1,13 +1,22 @@
 import { Component, OnInit } from '@angular/core';
 import { Client } from 'src/app/models/client.model';
-import { Reservation, Seat } from 'src/app/models/reservation.model';
+import { Reservation } from 'src/app/models/reservation.model';
 import { ClientService } from 'src/app/services/client.service';
 import { ReservationService } from 'src/app/services/reservation.service';
 import { uniq } from 'lodash';
 import { switchMap, map } from 'rxjs/operators';
-import { combineLatest, forkJoin, of } from 'rxjs';
+import { Observable, combineLatest, forkJoin, of } from 'rxjs';
 import { ActivatedRoute } from '@angular/router';
 import { CsvService } from 'src/app/services/csv.service';
+import { Seat } from 'src/app/models/seat.model';
+
+interface ReservationSummary {
+  key?: string | null;
+  client?: Client;
+  event?: string;
+  seats?: Seat[];
+  total?: number;
+}
 
 @Component({
   selector: 'app-event-reservations',
@@ -15,33 +24,24 @@ import { CsvService } from 'src/app/services/csv.service';
   styleUrls: ['./event-reservations.component.scss'],
 })
 export class EventReservationsComponent implements OnInit {
-  reservations?: {
-    client: Client | undefined;
-    key?: string | null | undefined;
-    event?: string | undefined;
-    seats?: Seat[] | undefined;
-    total?: number | undefined;
-  }[];
-  key?: string | null;
-  columnsToDisplay = ['client', 'total'];
+  private _reservations?: ReservationSummary[] = undefined;
+  private _key: string | null = null;
+  private _columnsToDisplay: string[] = ['client', 'total'];
 
   constructor(
     private activatedRoute: ActivatedRoute,
     private reservationService: ReservationService,
     private clientService: ClientService,
-    private csvService: CsvService
-  ) {}
+    private csvService: CsvService) { }
 
-  ngOnInit(): void {
+  public ngOnInit(): void {
     this.activatedRoute.paramMap.subscribe((paramMap) => {
-      this.key = paramMap.get('key');
-      if (this.key) {
-        this.getReservations();
-      }
+      this._key = paramMap.get('key');
+      this.getReservations();
     });
   }
 
-  getReservations(): void {
+  public getReservations(): void {
     this.reservationService
       .getAll()
       .pipe(
@@ -55,7 +55,7 @@ export class EventReservationsComponent implements OnInit {
           return forkJoin([
             of(
               reservations.filter(
-                (reservation) => reservation.event === this.key
+                (reservation) => reservation.event === this._key
               )
             ),
             combineLatest(clients),
@@ -70,16 +70,22 @@ export class EventReservationsComponent implements OnInit {
           }));
         })
       )
-      .subscribe((data) => (this.reservations = data));
+      .subscribe((data) => (this._reservations = data));
   }
 
-  getClients(clientIds: (string | undefined)[]) {
+  private getClients(clientIds: (string | undefined)[]): Observable<Client>[] {
     return clientIds.map((clientId) => this.clientService.get(clientId ?? ''));
   }
 
-  downloadCSV() {
-    if (this.reservations) {
-      this.csvService.download(this.reservations, 'reservations.csv');
-    }
+  public downloadCSV(): void {
+    this.csvService.download(this._reservations, 'reservations.csv');
+  }
+
+  public get reservations(): ReservationSummary[] | undefined {
+    return this._reservations;
+  }
+
+  public get columnsToDisplay(): string[] {
+    return this._columnsToDisplay;
   }
 }

@@ -7,22 +7,22 @@ import { MatDialogRef } from '@angular/material/dialog';
   styleUrls: ['./delete-dialog.component.scss'],
 })
 export class DeleteDialogComponent {
-  constructor(public dialog: MatDialogRef<DeleteDialogComponent>) {}
+  constructor(private dialog: MatDialogRef<DeleteDialogComponent>) { }
 
-  cancel() {
+  public cancel(): void {
     this.close(false);
   }
 
-  close(value: boolean) {
-    this.dialog.close(value);
-  }
-
-  confirm() {
+  public confirm(): void {
     this.close(true);
   }
 
   @HostListener('keydown.esc')
-  onEsc() {
+  public onEsc(): void {
     this.close(false);
+  }
+
+  public close(value: boolean): void {
+    this.dialog.close(value);
   }
 }

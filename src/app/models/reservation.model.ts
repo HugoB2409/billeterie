@@ -1,13 +1,9 @@
-export class Reservation {
+import { Seat } from './seat.model';
+
+export interface Reservation {
   key?: string | null;
   event?: string;
   client?: string;
   seats?: Seat[];
   total?: number;
-}
-
-export class Seat {
-  name?: string;
-  price?: number;
-  quantity?: number;
 }

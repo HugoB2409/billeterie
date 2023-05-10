@@ -5,9 +5,9 @@ import { saveAs } from 'file-saver';
   providedIn: 'root',
 })
 export class CsvService {
-  constructor() {}
+  constructor() { }
 
-  download(data: any, filename: string) {
+  public download(data: any, filename: string): void {
     const replacer = (_key: any, value: any) =>
       value === null ? 'EMPTY' : value;
 

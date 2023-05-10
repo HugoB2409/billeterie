@@ -12,16 +12,15 @@ import { Observable } from 'rxjs';
   providedIn: 'root',
 })
 export class EventService implements IRealtimeDatabaseService<Event> {
-  private dbPath = '/events';
-
-  eventsRef: AngularFireList<Event>;
+  private _dbPath = '/events';
+  private _eventsRef: AngularFireList<Event>;
 
   constructor(private db: AngularFireDatabase) {
-    this.eventsRef = db.list(this.dbPath);
+    this._eventsRef = db.list(this._dbPath);
   }
 
-  getAll(): Observable<Event[]> {
-    return this.eventsRef
+  public getAll(): Observable<Event[]> {
+    return this._eventsRef
       .snapshotChanges()
       .pipe(
         map((changes) =>
@@ -30,9 +29,9 @@ export class EventService implements IRealtimeDatabaseService<Event> {
       );
   }
 
-  get(key: string): Observable<Event> {
+  public get(key: string): Observable<Event> {
     return this.db
-      .object(this.dbPath + '/' + key)
+      .object(this._dbPath + '/' + key)
       .snapshotChanges()
       .pipe(
         take(1),
@@ -44,19 +43,15 @@ export class EventService implements IRealtimeDatabaseService<Event> {
       );
   }
 
-  create(event: Event): any {
-    return this.eventsRef.push(event);
+  public create(event: Event): any {
+    return this._eventsRef.push(event);
   }
 
-  update(key: string, value: any): Promise<void> {
-    return this.eventsRef.update(key, value);
+  public update(key: string, value: any): Promise<void> {
+    return this._eventsRef.update(key, value);
   }
 
-  delete(key: string): Promise<void> {
-    return this.eventsRef.remove(key);
-  }
-
-  deleteAll(): Promise<void> {
-    return this.eventsRef.remove();
+  public delete(key: string): Promise<void> {
+    return this._eventsRef.remove(key);
   }
 }

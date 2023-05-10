@@ -12,16 +12,15 @@ import { Observable } from 'rxjs';
   providedIn: 'root',
 })
 export class ClientService implements IRealtimeDatabaseService<Client> {
-  private dbPath = '/clients';
-
-  clientsRef: AngularFireList<Client>;
+  private _dbPath = '/clients';
+  private _clientsRef: AngularFireList<Client>;
 
   constructor(private db: AngularFireDatabase) {
-    this.clientsRef = db.list(this.dbPath);
+    this._clientsRef = db.list(this._dbPath);
   }
 
-  getAll(): Observable<Client[]> {
-    return this.clientsRef
+  public getAll(): Observable<Client[]> {
+    return this._clientsRef
       .snapshotChanges()
       .pipe(
         map((changes) =>
@@ -30,9 +29,9 @@ export class ClientService implements IRealtimeDatabaseService<Client> {
       );
   }
 
-  get(key: string): Observable<Client> {
+  public get(key: string): Observable<Client> {
     return this.db
-      .object(this.dbPath + '/' + key)
+      .object(this._dbPath + '/' + key)
       .snapshotChanges()
       .pipe(
         take(1),
@@ -44,19 +43,15 @@ export class ClientService implements IRealtimeDatabaseService<Client> {
       );
   }
 
-  create(client: Client): any {
-    return this.clientsRef.push(client);
+  public create(client: Client): any {
+    return this._clientsRef.push(client);
   }
 
-  update(key: string, value: any): Promise<void> {
-    return this.clientsRef.update(key, value);
+  public update(key: string, value: any): Promise<void> {
+    return this._clientsRef.update(key, value);
   }
 
-  delete(key: string): Promise<void> {
-    return this.clientsRef.remove(key);
-  }
-
-  deleteAll(): Promise<void> {
-    return this.clientsRef.remove();
+  public delete(key: string): Promise<void> {
+    return this._clientsRef.remove(key);
   }
 }

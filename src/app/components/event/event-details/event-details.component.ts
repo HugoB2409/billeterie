@@ -12,48 +12,43 @@ import { DeleteDialogComponent } from '../../dialog/delete-dialog/delete-dialog.
   styleUrls: ['./event-details.component.scss'],
 })
 export class EventDetailsComponent implements OnInit {
-  event?: Event | null;
-  key?: string | null;
-  eventForm?: FormGroup;
+  private _eventForm?: FormGroup = undefined;
+  private _event?: Event = undefined;
+  private _key: string | null = null;
 
   constructor(
     private router: Router,
     private formBuilder: FormBuilder,
     private activatedRoute: ActivatedRoute,
     private eventService: EventService,
-    public dialog: MatDialog
-  ) {}
+    private dialog: MatDialog) { }
 
-  ngOnInit() {
+  public ngOnInit(): void {
     this.activatedRoute.paramMap.subscribe((paramMap) => {
-      this.key = paramMap.get('key');
-      if (this.key) {
-        this.eventService.get(this.key).subscribe((data) => {
-          this.event = data;
-
-          this.eventForm = this.formBuilder.group({
-            title: [this.event?.title, [Validators.required]],
-            date: [new Date(this.event?.date ?? ''), [Validators.required]],
-            options: this.formBuilder.array(this.initializeOptions()),
-          });
+      this._key = paramMap.get('key');
+      if (!this._key) return;
+      this.eventService.get(this._key).subscribe((data) => {
+        this._event = data;
+        this._eventForm = this.formBuilder.group({
+          title: [this._event?.title, [Validators.required]],
+          date: [new Date(this._event.date ?? ''), [Validators.required]],
+          options: this.formBuilder.array(this.initializeOptions()),
         });
-      }
+      });
     });
   }
 
-  initializeOptions() {
-    if (this.event?.options) {
-      return this.event.options.map((option) => {
-        return this.formBuilder.group({
-          name: [option.name, [Validators.required]],
-          price: [option.price, [Validators.required]],
-        });
-      });
-    }
-    return [];
+  private initializeOptions(): FormGroup[] {
+    if (!this._event?.options) return [];
+    return this._event.options.map((option) =>
+      this.formBuilder.group({
+        name: [option.name, [Validators.required]],
+        price: [option.price, [Validators.required]],
+      })
+    );
   }
 
-  addOption() {
+  public addOption(): void {
     const option = this.formBuilder.group({
       name: ['', [Validators.required]],
       price: ['', [Validators.required]],
@@ -61,31 +56,32 @@ export class EventDetailsComponent implements OnInit {
     this.options.push(option);
   }
 
-  removeOption(i: number) {
+  public removeOption(i: number): void {
     this.options.removeAt(i);
   }
 
-  get options() {
-    return this.eventForm?.get('options') as FormArray;
+  public async modifyEvent(): Promise<void> {
+    if (!this._key || !this._eventForm) return;
+    this._eventForm.value.date = this._eventForm?.value.date.toString();
+    await this.eventService.update(this._key, this._eventForm?.value);
+    this.router.navigate(['/']);
   }
 
-  modifyEvent(): void {
-    if (this.key && this.eventForm) {
-      this.eventForm.value.date = this.eventForm?.value.date.toString();
-      this.eventService.update(this.key, this.eventForm?.value).then(() => {
-        this.router.navigate(['/']);
-      });
-    }
-  }
-
-  delete() {
+  public delete(): void {
     const dialogRef = this.dialog.open(DeleteDialogComponent);
 
     dialogRef.afterClosed().subscribe((result) => {
-      if (result && this.key) {
-        this.eventService.delete(this.key);
-        this.router.navigate(['/']);
-      }
+      if (!result || !this._key) return;
+      this.eventService.delete(this._key);
+      this.router.navigate(['/']);
     });
+  }
+
+  public get options(): FormArray {
+    return this._eventForm?.get('options') as FormArray;
+  }
+
+  public get eventForm(): FormGroup | undefined {
+    return this._eventForm;
   }
 }
